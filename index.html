@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Trend Radar</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #efefec;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --accent: #0f6e56;
+      --accent-light: #e1f5ee;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a1a;
+        --bg-secondary: #242424;
+        --bg-tertiary: #2e2e2e;
+        --text: #f0f0ee;
+        --text-secondary: #888884;
+        --border: rgba(255,255,255,0.1);
+        --border-hover: rgba(255,255,255,0.22);
+        --accent: #5dcaa5;
+        --accent-light: #04342c;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 15px;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15,110,86,0.12);
+    }
+
+    input[type="text"]::placeholder { color: var(--text-secondary); }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    button:hover { background: var(--bg-secondary); }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .topic-item {
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+
+    .topic-item:last-child { margin-bottom: 0; }
+
+    .topic-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .topic-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .list-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .list-item:last-child { margin-bottom: 0; }
+
+    .list-item i {
+      font-size: 14px;
+      margin-top: 2px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .keyword {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      color: var(--text);
+    }
+
+    .platform-item {
+      margin-bottom: 8px;
+    }
+
+    .platform-item:last-child { margin-bottom: 0; }
+
+    .platform-name {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .platform-tip {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 2.5rem 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    #loading i { font-size: 28px; display: block; margin-bottom: 10px; }
+
+    #error {
+      font-size: 14px;
+      color: #a32d2d;
+      padding: 1rem 0;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 500px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="eyebrow">Cross-border e-commerce intelligence</p>
+    <h1>Global Trend Radar</h1>
+    <p class="subtitle">Enter a product category or keyword to surface overseas consumer trends, content angles, and platform insights.</p>
+
+    <div class="search-row">
+      <input id="query" type="text" placeholder="e.g. skincare, portable speaker, pet tech…" />
+      <button id="scanBtn" onclick="scan()">Scan trends ↗</button>
+    </div>
+
+    <div id="loading" style="display:none;">
+      <i class="ti ti-radar"></i>
+      Scanning global signals…
+    </div>
+
+    <div id="error" style="display:none;"></div>
+
+    <div id="output" style="display:none;">
+      <div class="card">
+        <p class="card-label">Trending topics</p>
+        <div id="topics"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0;">
+          <p class="card-label">Content angles</p>
+          <div id="angles"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <p class="card-label">User pain points</p>
+          <div id="pains"></div>
+        </div>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0;">
+          <p class="card-label">Hot keywords</p>
+          <div id="keywords" class="keywords"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <p class="card-label">Platform spotlight</p>
+          <div id="platforms"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer">Powered by Claude · Built with vibe coding</p>
+  </div>
+
+  <script>
+    async function scan() {
+      const q = document.getElementById('query').value.trim();
+      if (!q) return;
+      document.getElementById('output').style.display = 'none';
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('scanBtn').disabled = true;
+
+      const prompt = `You are a cross-border e-commerce trend analyst specializing in overseas consumer markets (US, EU, Southeast Asia).
+Analyze the product category or keyword: "${q}"
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact format:
+{
+  "trending_topics": [
+    {"topic": "short topic name", "description": "1-2 sentence explanation of why this is trending overseas"}
+  ],
+  "content_angles": ["angle 1", "angle 2", "angle 3", "angle 4"],
+  "user_pain_points": ["pain point 1", "pain point 2", "pain point 3", "pain point 4"],
+  "hot_keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5", "keyword6"],
+  "platform_spotlight": [
+    {"platform": "TikTok", "tip": "one sentence on how this category performs here"},
+    {"platform": "Instagram", "tip": "one sentence on how this category performs here"},
+    {"platform": "Amazon", "tip": "one sentence on how this category performs here"}
+  ]
+}
+
+trending_topics: 3-4 items. Be specific and insightful, not generic.`;
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+        const data = await res.json();
+        const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+        const json = JSON.parse(text.replace(/```json|```/g, '').trim());
+        render(json);
+      } catch(e) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'Something went wrong. Please try again.';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('scanBtn').disabled = false;
+      }
+    }
+
+    function render(d) {
+      document.getElementById('topics').innerHTML = d.trending_topics.map(t => `
+        <div class="topic-item">
+          <p class="topic-name">${t.topic}</p>
+          <p class="topic-desc">${t.description}</p>
+        </div>`).join('');
+
+      document.getElementById('angles').innerHTML = d.content_angles.map(a => `
+        <div class="list-item">
+          <i class="ti ti-arrow-right"></i>
+          <span>${a}</span>
+        </div>`).join('');
+
+      document.getElementById('pains').innerHTML = d.user_pain_points.map(p => `
+        <div class="list-item">
+          <i class="ti ti-alert-circle"></i>
+          <span>${p}</span>
+        </div>`).join('');
+
+      document.getElementById('keywords').innerHTML = d.hot_keywords.map(k => `
+        <span class="keyword">${k}</span>`).join('');
+
+      document.getElementById('platforms').innerHTML = d.platform_spotlight.map(p => `
+        <div class="platform-item">
+          <p class="platform-name">${p.platform}</p>
+          <p class="platform-tip">${p.tip}</p>
+        </div>`).join('');
+
+      document.getElementById('output').style.display = 'block';
+    }
+
+    document.getElementById('query').addEventListener('keydown', e => {
+      if (e.key === 'Enter') scan();
+    });
+  </script>
+</body>
+</html>
